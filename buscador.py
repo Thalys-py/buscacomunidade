@@ -1,4 +1,3 @@
-
 import os
 print("Diretório atual:", os.getcwd())
 
@@ -9,7 +8,6 @@ from oauth2client.service_account import ServiceAccountCredentials
 
 app = Flask(__name__)
 
-
 def carregar_dados():
     try:
         scope = ["https://spreadsheets.google.com/feeds", 
@@ -17,11 +15,12 @@ def carregar_dados():
                  "https://www.googleapis.com/auth/drive.file", 
                  "https://www.googleapis.com/auth/drive"]
 
-import json
-import os
+        # Importando os módulos dentro do try
+        import json
+        import os
 
-credenciais_dict = json.loads(os.environ['GOOGLE_CREDENTIALS_JSON'])
-creds = ServiceAccountCredentials.from_json_keyfile_dict(credenciais_dict, scope)
+        credenciais_dict = json.loads(os.environ['GOOGLE_CREDENTIALS_JSON'])
+        creds = ServiceAccountCredentials.from_json_keyfile_dict(credenciais_dict, scope)
 
         client = gspread.authorize(creds)
 
@@ -42,8 +41,6 @@ creds = ServiceAccountCredentials.from_json_keyfile_dict(credenciais_dict, scope
         print(f"Erro ao carregar dados da planilha: {e}")
         return pd.DataFrame()
 
-
-
 @app.route('/')
 def index():
     query = request.args.get('q', '').lower()
@@ -58,4 +55,3 @@ def index():
 
 if __name__ == '__main__':
     app.run(debug=True)
-
