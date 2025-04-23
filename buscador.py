@@ -54,4 +54,7 @@ def index():
     return render_template('index.html', tabela=df_filtrado.to_dict(orient='records'), consulta=query)
 
 if __name__ == '__main__':
-    app.run(debug=True)
+ import os
+port = int(os.environ.get('PORT', 5000))  # Se não encontrar a variável PORT, usa a porta 5000
+app.run(debug=True, host='0.0.0.0', port=port)
+
