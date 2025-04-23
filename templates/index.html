@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Buscador</title>
+</head>
+<body>
+    <h1>Buscador de Negócios</h1>
+    <form method="get">
+        <input type="text" name="q" placeholder="Digite o que procura..." value="{{ consulta }}">
+        <button type="submit">Buscar</button>
+    </form>
+
+    {% if tabela %}
+        <h2>Resultados para "{{ consulta }}"</h2>
+        <table border="1">
+            <thead>
+                <tr>
+                    {% for chave in tabela[0].keys() %}
+                        <th>{{ chave }}</th>
+                    {% endfor %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for linha in tabela %}
+                    <tr>
+                        {% for valor in linha.values() %}
+                            <td>{{ valor }}</td>
+                        {% endfor %}
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% elif consulta %}
+        <p>Nenhum resultado encontrado para "{{ consulta }}".</p>
+    {% endif %}
+</body>
+</html>
+
