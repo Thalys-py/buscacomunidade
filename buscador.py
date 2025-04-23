@@ -17,8 +17,12 @@ def carregar_dados():
                  "https://www.googleapis.com/auth/drive.file", 
                  "https://www.googleapis.com/auth/drive"]
 
-        creds = ServiceAccountCredentials.from_json_keyfile_name(
-            "just-camera-457523-f5-bea28060772f.json", scope)
+import json
+import os
+
+credenciais_dict = json.loads(os.environ['GOOGLE_CREDENTIALS_JSON'])
+creds = ServiceAccountCredentials.from_json_keyfile_dict(credenciais_dict, scope)
+
         client = gspread.authorize(creds)
 
         # Aqui está o ID correto (não o link inteiro!)
