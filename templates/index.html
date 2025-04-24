@@ -2,38 +2,51 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <title>Buscador</title>
+    <title>Buscador de Negócios</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
-<body>
-    <h1>Buscador de Negócios</h1>
-    <form method="get">
-        <input type="text" name="q" placeholder="Digite o que procura..." value="{{ consulta }}">
-        <button type="submit">Buscar</button>
+<body class="container mt-5">
+
+    <h1 class="mb-4 text-center">🔍 Buscador de Negócios</h1>
+
+    <form method="get" class="mb-4">
+        <div class="input-group">
+            <input type="text" name="q" class="form-control" placeholder="Digite o que procura..." value="{{ consulta }}">
+            <button class="btn btn-primary" type="submit">Buscar</button>
+        </div>
     </form>
 
     {% if tabela %}
-        <h2>Resultados para "{{ consulta }}"</h2>
-        <table border="1">
-            <thead>
-                <tr>
-                    {% for chave in tabela[0].keys() %}
-                        <th>{{ chave }}</th>
-                    {% endfor %}
-                </tr>
-            </thead>
-            <tbody>
-                {% for linha in tabela %}
+        <h4>Resultados para "<strong>{{ consulta }}</strong>"</h4>
+        <div class="table-responsive mt-3">
+            <table class="table table-bordered table-striped table-hover">
+                <thead class="table-light">
                     <tr>
-                        {% for valor in linha.values() %}
-                            <td>{{ valor }}</td>
+                        {% for chave in tabela[0].keys() %}
+                            <th>{{ chave }}</th>
                         {% endfor %}
                     </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                    {% for linha in tabela %}
+                        <tr>
+                            {% for valor in linha.values() %}
+                                <td>{{ valor }}</td>
+                            {% endfor %}
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
     {% elif consulta %}
-        <p>Nenhum resultado encontrado para "{{ consulta }}".</p>
+        <div class="alert alert-warning mt-3 text-center">
+            Nenhum resultado encontrado para "<strong>{{ consulta }}</strong>".
+        </div>
     {% endif %}
+
+    <!-- Bootstrap JS (opcional, para funcionalidades interativas futuras) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
-
