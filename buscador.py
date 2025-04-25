@@ -1,41 +1,37 @@
 import os
-print("Diretório atual:", os.getcwd())
-
-from flask import Flask, render_template, request
+import json
 import pandas as pd
 import gspread
+from flask import Flask, render_template, request
 from oauth2client.service_account import ServiceAccountCredentials
 
 app = Flask(__name__)
 
+# Função para carregar os dados da planilha
 def carregar_dados():
     try:
-        scope = ["https://spreadsheets.google.com/feeds", 
-                 "https://www.googleapis.com/auth/spreadsheets",
-                 "https://www.googleapis.com/auth/drive.file", 
-                 "https://www.googleapis.com/auth/drive"]
-
-        # Importando os módulos dentro do try
-        import json
-        import os
+        scope = [
+            "https://spreadsheets.google.com/feeds",
+            "https://www.googleapis.com/auth/spreadsheets",
+            "https://www.googleapis.com/auth/drive.file",
+            "https://www.googleapis.com/auth/drive"
+        ]
 
         credenciais_dict = json.loads(os.environ['GOOGLE_CREDENTIALS_JSON'])
         creds = ServiceAccountCredentials.from_json_keyfile_dict(credenciais_dict, scope)
-
         client = gspread.authorize(creds)
 
-        # Aqui está o ID correto (não o link inteiro!)
+        # Conectar-se à planilha pelo ID
         sheet_id = "1CLyIY19Lkc5i_5nOz1Z5FRTvhqt-Z-kJcvZaxPs_2Lw"
         sheet = client.open_by_key(sheet_id)
-
-        # 🔍 Isso vai listar as abas disponíveis
-        print([w.title for w in sheet.worksheets()])
-
-        # Tente acessar sua aba (com nome correto depois de ver o print)
+        
+        # Pega a aba correta
         aba = sheet.worksheet("Respostas ao formulário 1")
 
+        # Carregar os dados para um DataFrame
         dados = aba.get_all_records()
         df = pd.DataFrame(dados)
+
         return df
     except Exception as e:
         print(f"Erro ao carregar dados da planilha: {e}")
@@ -44,17 +40,29 @@ def carregar_dados():
 @app.route('/')
 def index():
     query = request.args.get('q', '').lower()
+    filtro_categoria = request.args.get('categoria', '')
+
     df = carregar_dados()
 
-    if not df.empty and query:
-        df_filtrado = df[df.apply(lambda row: query in str(row).lower(), axis=1)]
-    else:
-        df_filtrado = df
+    # Obter categorias únicas para o dropdown
+    categorias = sorted(df['Categoria de negócios'].dropna().unique()) if not df.empty else []
 
-    return render_template('index.html', tabela=df_filtrado.to_dict(orient='records'), consulta=query)
+    # Filtragem pelo texto digitado e pela categoria
+    if not df.empty:
+        if query:
+            df = df[df.apply(lambda row: query in str(row).lower(), axis=1)]
+        if filtro_categoria:
+            df = df[df['Categoria de negócios'] == filtro_categoria]
+
+    return render_template(
+        'index.html',
+        tabela=df.to_dict(orient='records'),
+        consulta=query,
+        categorias=categorias,
+        categoria_selecionada=filtro_categoria
+    )
 
 if __name__ == '__main__':
- import os
-port = int(os.environ.get('PORT', 5000))  # Se não encontrar a variável PORT, usa a porta 5000
-app.run(debug=True, host='0.0.0.0', port=port)
+    port = int(os.environ.get('PORT', 5000))
+    app.run(debug=True, host='0.0.0.0', port=port)
 
