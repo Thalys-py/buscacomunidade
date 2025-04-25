@@ -4,66 +4,145 @@
     <meta charset="UTF-8">
     <title>Buscador de Negócios</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8f9fa;
+        }
+
+        .buscador-container {
+            background: white;
+            padding: 2rem;
+            border-radius: 1rem;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+        }
+
+        .form-control, .form-select {
+            border-radius: 0.5rem;
+        }
+
+        .table thead {
+            background-color: #f1f3f5;
+        }
+
+        footer {
+            margin-top: 4rem;
+        }
+
+        .btn-outline-primary {
+            border-radius: 0.5rem;
+            font-weight: 600;
+        }
+
+        .titulo-site {
+            font-size: 2.5rem;
+            font-weight: 600;
+            color: #0d6efd;
+        }
+
+        /* Ajustes de responsividade */
+        @media (max-width: 768px) {
+            .buscador-container {
+                padding: 1.5rem;
+            }
+
+            .titulo-site {
+                font-size: 2rem;
+            }
+
+            .form-control, .form-select, .btn-outline-primary {
+                font-size: 1rem;
+            }
+
+            .table thead th {
+                font-size: 0.875rem;
+            }
+
+            .table tbody td {
+                font-size: 0.875rem;
+            }
+
+            .form-control, .form-select {
+                width: 100%;
+            }
+
+            .col-md-6, .col-md-4, .col-md-2 {
+                width: 100%;
+                margin-bottom: 1rem;
+            }
+
+            .d-grid {
+                width: 100%;
+            }
+        }
+    </style>
 </head>
-<body class="container mt-5">
+<body class="container py-5">
 
-    <h1 class="mb-4 text-center text-primary display-5">🔍 Buscador de Negócios</h1>
+    <div class="buscador-container">
+        <h1 class="text-center titulo-site mb-4">🔍 Buscador de Negócios</h1>
 
-    <!-- Formulário de busca e filtro -->
-    <form method="get" class="mb-4">
-        <div class="row g-2">
-            <div class="col-md-6">
-                <input type="text" name="q" class="form-control" placeholder="Digite o que procura..." value="{{ consulta }}" autofocus>
-            </div>
-            <div class="col-md-4">
-                <select name="categoria" class="form-select">
-                    <option value="">Todas as categorias</option>
-                    {% for categoria in categorias %}
-                        <option value="{{ categoria }}" {% if categoria == categoria_selecionada %}selected{% endif %}>
-                            {{ categoria }}
-                        </option>
-                    {% endfor %}
-                </select>
-            </div>
-            <div class="col-md-2">
-                <button class="btn btn-outline-primary w-100" type="submit">Buscar</button>
-            </div>
-        </div>
-    </form>
-
-    <!-- Tabela de resultados -->
-    {% if tabela %}
-        <h4>Resultados para "<strong>{{ consulta }}</strong>" {% if categoria_selecionada %} na categoria "<strong>{{ categoria_selecionada }}</strong>"{% endif %}</h4>
-        <div class="table-responsive mt-3">
-            <table class="table table-bordered table-striped table-hover">
-                <thead class="table-light">
-                    <tr>
-                        {% for chave in tabela[0].keys() %}
-                            <th>{{ chave }}</th>
+        <!-- Formulário de busca e filtro -->
+        <form method="get" class="mb-4">
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <input type="text" name="q" class="form-control shadow-sm" placeholder="Digite o que procura..." value="{{ consulta }}" autofocus>
+                </div>
+                <div class="col-md-4">
+                    <select name="categoria" class="form-select shadow-sm">
+                        <option value="">Todas as categorias</option>
+                        {% for categoria in categorias %}
+                            <option value="{{ categoria }}" {% if categoria == categoria_selecionada %}selected{% endif %}>
+                                {{ categoria }}
+                            </option>
                         {% endfor %}
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for linha in tabela %}
+                    </select>
+                </div>
+                <div class="col-md-2 d-grid">
+                    <button class="btn btn-outline-primary shadow-sm" type="submit">Buscar</button>
+                </div>
+            </div>
+        </form>
+
+        <!-- Resultados -->
+        {% if tabela %}
+            <h5 class="mb-3">Exibindo resultados para "<strong>{{ consulta }}</strong>" {% if categoria_selecionada %} na categoria "<strong>{{ categoria_selecionada }}</strong>"{% endif %}</h5>
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover align-middle text-center">
+                    <thead class="table-light">
                         <tr>
-                            {% for valor in linha.values() %}
-                                <td>{{ valor }}</td>
+                            {% for chave in tabela[0].keys() %}
+                                <th class="text-nowrap">{{ chave }}</th>
                             {% endfor %}
                         </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-    {% elif consulta or categoria_selecionada %}
-        <div class="alert alert-warning mt-3 text-center">
-            Nenhum resultado encontrado para "<strong>{{ consulta }}</strong>"{% if categoria_selecionada %} na categoria "<strong>{{ categoria_selecionada }}</strong>"{% endif %}.
-        </div>
-    {% endif %}
+                    </thead>
+                    <tbody>
+                        {% for linha in tabela %}
+                            <tr>
+                                {% for valor in linha.values() %}
+                                    <td>{{ valor }}</td>
+                                {% endfor %}
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% elif consulta or categoria_selecionada %}
+            <div class="alert alert-warning text-center mt-4">
+                Nenhum resultado encontrado para "<strong>{{ consulta }}</strong>"{% if categoria_selecionada %} na categoria "<strong>{{ categoria_selecionada }}</strong>"{% endif %}.
+            </div>
+        {% endif %}
+    </div>
 
     <!-- Rodapé -->
-    <footer class="text-center mt-5 text-secondary small">
+    <footer class="text-center text-secondary small">
         <hr>
         <p>Feito por Thalys • (54) 99616-1606</p>
     </footer>
@@ -72,4 +151,3 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
-
