@@ -92,9 +92,7 @@
         <!-- Formulário de busca e filtro -->
         <form method="get" class="mb-4">
             <div class="row g-3">
-                <div class="col-md-6">
-                    <input type="text" name="q" class="form-control shadow-sm" placeholder="Digite o que procura..." value="{{ consulta }}" autofocus>
-                </div>
+                <!-- Dropdown de categoria antes da caixa de busca -->
                 <div class="col-md-4">
                     <select name="categoria" class="form-select shadow-sm">
                         <option value="">Todas as categorias</option>
@@ -104,6 +102,9 @@
                             </option>
                         {% endfor %}
                     </select>
+                </div>
+                <div class="col-md-6">
+                    <input type="text" name="q" class="form-control shadow-sm" placeholder="Digite o que procura..." value="{{ consulta }}" autofocus>
                 </div>
                 <div class="col-md-2 d-grid">
                     <button class="btn btn-outline-primary shadow-sm" type="submit">Buscar</button>
