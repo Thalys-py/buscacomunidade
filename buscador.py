@@ -45,14 +45,14 @@ def index():
     df = carregar_dados()
 
     # Obter categorias únicas para o dropdown
-    categorias = sorted(df['Categoria de negócios'].dropna().unique()) if not df.empty else []
+    categorias = sorted(df['Categoria do Negócio'].dropna().unique()) if not df.empty else []
 
     # Filtragem pelo texto digitado e pela categoria
     if not df.empty:
         if query:
             df = df[df.apply(lambda row: query in str(row).lower(), axis=1)]
         if filtro_categoria:
-            df = df[df['Categoria de negócios'] == filtro_categoria]
+            df = df[df['Categoria do Negócio'] == filtro_categoria]
 
     return render_template(
         'index.html',
