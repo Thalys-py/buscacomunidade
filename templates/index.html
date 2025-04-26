@@ -51,6 +51,12 @@
             background-color: #f1f3f5;
             transition: background-color 0.2s;
         }
+        .business-card .card-title {
+            margin-bottom: 0.5rem;
+        }
+        .business-card .btn-sm {
+            margin-top: 0.5rem;
+        }
         .loading-spinner {
             position: fixed;
             top: 50%;
@@ -80,6 +86,9 @@
             }
             .business-card {
                 padding: 0.75rem;
+            }
+            .business-card .card-title {
+                font-size: 1.1rem;
             }
         }
     </style>
@@ -141,7 +150,7 @@
                     {% for linha in tabela | selectattr('Categoria do Negócio', 'equalto', categoria) | sort(attribute='Nome da Empresa') %}
                         <div class="business-card card mb-2 shadow-sm">
                             <div class="card-body">
-                                <h5 class="card-title mb-2">{{ linha['Nome da Empresa'] | escape }}</h5>
+                                <h5 class="card-title">{{ linha['Nome da Empresa'] | escape }}</h5>
                                 <button class="btn btn-outline-primary btn-sm" type="button" data-bs-toggle="collapse" data-bs-target="#details-{{ categoria | replace(' ', '-') }}-{{ loop.index }}" aria-expanded="false" aria-controls="details-{{ categoria | replace(' ', '-') }}-{{ loop.index }}">
                                     Ver mais
                                 </button>
