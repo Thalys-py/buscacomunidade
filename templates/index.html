@@ -29,13 +29,6 @@
         .form-control, .form-select {
             border-radius: 0.5rem;
         }
-        .table thead {
-            background-color: #f1f3f5;
-        }
-        .table tbody tr:hover {
-            background-color: #f1f3f5;
-            transition: background-color 0.2s;
-        }
         footer {
             margin-top: 4rem;
         }
@@ -48,11 +41,15 @@
             font-weight: 600;
             color: #0d6efd;
         }
-        .card-details {
-            display: none;
+        .category-header {
+            background-color: #f1f3f5;
+            padding: 0.75rem;
+            border-radius: 0.5rem;
+            margin-bottom: 1rem;
         }
-        .card-details.show {
-            display: block;
+        .business-card:hover {
+            background-color: #f1f3f5;
+            transition: background-color 0.2s;
         }
         .loading-spinner {
             position: fixed;
@@ -71,15 +68,18 @@
             .form-control, .form-select, .btn-outline-primary, .btn-outline-secondary {
                 font-size: 0.9rem;
             }
-            .table thead th, .table tbody td {
-                font-size: 0.8rem;
-            }
             .row.g-3 > * {
                 margin-bottom: 0.5rem;
             }
             .btn-sm {
                 font-size: 0.8rem;
                 padding: 0.4rem 0.8rem;
+            }
+            .category-header {
+                font-size: 1rem;
+            }
+            .business-card {
+                padding: 0.75rem;
             }
         }
     </style>
@@ -116,7 +116,7 @@
                 <div class="col-md-4">
                     <div class="d-flex gap-2">
                         <button class="btn btn-outline-primary shadow-sm flex-fill" type="submit" aria-label="Buscar negócios">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-search" viewBox="0 16">
                                 <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/>
                             </svg>
                             Buscar
@@ -131,51 +131,42 @@
         {% if tabela %}
             <h5 class="mb-3">Exibindo resultados para "<strong>{{ consulta | escape }}</strong>" {% if categoria_selecionada %} na categoria "<strong>{{ categoria_selecionada | escape }}</strong>"{% endif %}</h5>
 
-            <!-- Tabela para desktops -->
-            <div class="table-responsive d-none d-md-block">
-                <table class="table table-bordered table-hover align-middle text-center">
-                    <thead class="table-light">
-                        <tr>
-                            {% for chave in tabela[0].keys() %}
-                                <th class="text-nowrap">{{ chave | escape }}</th>
-                            {% endfor %}
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for linha in tabela %}
-                            <tr>
-                                {% for valor in linha.values() %}
-                                    <td>{{ valor | escape }}</td>
-                                {% endfor %}
-                            </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
+            <!-- Agrupamento por categoria -->
+            {% set grouped = {} %}
+            {% for linha in tabela %}
+                {% set categoria = linha['Categoria do Negócio'] %}
+                {% if categoria not in grouped %}
+                    {% do grouped.update({categoria: []}) %}
+                {% endif %}
+                {% do grouped[categoria].append(linha) %}
+            {% endfor %}
 
-            <!-- Cartões para dispositivos móveis -->
-            <div class="d-md-none">
-                {% for linha in tabela %}
-                    <div class="card mb-3 shadow-sm">
-                        <div class="card-body">
-                            <h5 class="card-title">{{ linha['Nome da Empresa'] | escape }}</h5>
-                            <p class="card-text">{{ linha['Categoria do Negócio'] | escape }}</p>
-                            <button class="btn btn-outline-primary btn-sm" type="button" data-bs-toggle="collapse" data-bs-target="#details-{{ loop.index }}" aria-expanded="false" aria-controls="details-{{ loop.index }}">
-                                Ver mais
-                            </button>
-                            <div class="collapse mt-3" id="details-{{ loop.index }}">
-                                <ul class="list-group list-group-flush">
-                                    {% for chave, valor in linha.items() %}
-                                        {% if chave not in ['Nome da Empresa', 'Categoria do Negócio'] %}
-                                            <li class="list-group-item"><strong>{{ chave | escape }}:</strong> {{ valor | escape }}</li>
-                                        {% endif %}
-                                    {% endfor %}
-                                </ul>
+            {% for categoria, negocios in grouped.items() | sort %}
+                <!-- Cabeçalho da categoria -->
+                <h6 class="category-header">{{ categoria | escape }}</h6>
+                <!-- Lista de negócios -->
+                <div class="mb-4">
+                    {% for linha in negocios | sort(attribute='Nome da Empresa') %}
+                        <div class="business-card card mb-2 shadow-sm">
+                            <div class="card-body">
+                                <h5 class="card-title mb-2">{{ linha['Nome da Empresa'] | escape }}</h5>
+                                <button class="btn btn-outline-primary btn-sm" type="button" data-bs-toggle="collapse" data-bs-target="#details-{{ categoria | replace(' ', '-') }}-{{ loop.index }}" aria-expanded="false" aria-controls="details-{{ categoria | replace(' ', '-') }}-{{ loop.index }}">
+                                    Ver mais
+                                </button>
+                                <div class="collapse mt-3" id="details-{{ categoria | replace(' ', '-') }}-{{ loop.index }}">
+                                    <ul class="list-group list-group-flush">
+                                        {% for chave, valor in linha.items() %}
+                                            {% if chave not in ['Nome da Empresa', 'Categoria do Negócio'] %}
+                                                <li class="list-group-item"><strong>{{ chave | escape }}:</strong> {{ valor | escape }}</li>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </ul>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                {% endfor %}
-            </div>
+                    {% endfor %}
+                </div>
+            {% endfor %}
         {% elif consulta or categoria_selecionada %}
             <div class="alert alert-warning text-center mt-4">
                 Nenhum resultado encontrado para "<strong>{{ consulta | escape }}</strong>"{% if categoria_selecionada %} na categoria "<strong>{{ categoria_selecionada | escape }}</strong>"{% endif %}. Tente outro termo ou categoria.
