@@ -110,7 +110,7 @@
         <form method="get" class="mb-4" id="search-form">
             <div class="row g-3">
                 <div class="col-md-4">
-                    <label for="categoria" class="form-label">Categoria</label>
+                    <label for="categoria" class="form-label">Filtrar Categoria</label>
                     <select id="categoria" name="categoria" class="form-select shadow-sm">
                         <option value="">Todas as categorias</option>
                         {% for categoria in categorias %}
@@ -121,7 +121,7 @@
                     </select>
                 </div>
                 <div class="col-md-4">
-                    <label for="busca" class="form-label">Pesquisar negócios</label>
+                    <label for="busca" class="form-label">Pesquisar palavra-chave</label>
                     <input type="text" id="busca" name="q" class="form-control shadow-sm" placeholder="Digite o que procura..." value="{{ consulta | escape }}" autofocus>
                 </div>
                 <div class="col-md-4">
