@@ -83,14 +83,16 @@ def index():
             df = df[df['Categoria do Negócio'] == filtro_categoria]
 
     # Exibir número de registros para depuração
-    print(f"Registros enviados ao template: {len(df)}")
+    quantidade_resultados = len(df)
+    print(f"Registros enviados ao template: {quantidade_resultados}")
 
     return render_template(
         'index.html',
         tabela=df.to_dict(orient='records'),
         consulta=query,
         categorias=categorias,
-        categoria_selecionada=filtro_categoria
+        categoria_selecionada=filtro_categoria,
+        quantidade_resultados=quantidade_resultados
     )
 
 if __name__ == '__main__':
