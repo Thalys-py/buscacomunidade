@@ -39,7 +39,7 @@
         footer {
             margin-top: 4rem;
         }
-        .btn-outline-primary {
+        .btn-outline-primary, .btn-outline-secondary {
             border-radius: 0.5rem;
             font-weight: 600;
         }
@@ -48,41 +48,58 @@
             font-weight: 600;
             color: #0d6efd;
         }
+        .card-details {
+            display: none;
+        }
+        .card-details.show {
+            display: block;
+        }
+        .loading-spinner {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 1000;
+        }
         @media (max-width: 768px) {
             .buscador-container {
-                padding: 1.5rem;
+                padding: 1rem;
             }
             .titulo-site {
-                font-size: 2rem;
+                font-size: 1.8rem;
             }
-            .form-control, .form-select, .btn-outline-primary {
-                font-size: 1rem;
+            .form-control, .form-select, .btn-outline-primary, .btn-outline-secondary {
+                font-size: 0.9rem;
             }
             .table thead th, .table tbody td {
-                font-size: 0.875rem;
+                font-size: 0.8rem;
             }
-            .form-control, .form-select {
-                width: 100%;
+            .row.g-3 > * {
+                margin-bottom: 0.5rem;
             }
-            .col-md-6, .col-md-4, .col-md-2 {
-                width: 100%;
-                margin-bottom: 1rem;
-            }
-            .d-grid {
-                width: 100%;
+            .btn-sm {
+                font-size: 0.8rem;
+                padding: 0.4rem 0.8rem;
             }
         }
     </style>
 </head>
-<body class="container py-5">
+<body class="container py-4">
+    <!-- Indicador de Carregamento -->
+    <div id="loading" class="loading-spinner d-none">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Carregando...</span>
+        </div>
+    </div>
+
     <div class="buscador-container">
         <h1 class="text-center titulo-site mb-4">🔍 Buscador de Negócios da Comunidade</h1>
 
         <!-- Formulário de busca e filtro -->
-        <form method="get" class="mb-4">
+        <form method="get" class="mb-4" id="search-form">
             <div class="row g-3">
                 <div class="col-md-4">
-                    <label for="categoria" class="form-label visually-hidden">Categoria</label>
+                    <label for="categoria" class="form-label">Categoria</label>
                     <select id="categoria" name="categoria" class="form-select shadow-sm">
                         <option value="">Todas as categorias</option>
                         {% for categoria in categorias %}
@@ -92,17 +109,20 @@
                         {% endfor %}
                     </select>
                 </div>
-                <div class="col-md-6">
-                    <label for="busca" class="form-label visually-hidden">Pesquisar negócios</label>
+                <div class="col-md-4">
+                    <label for="busca" class="form-label">Pesquisar negócios</label>
                     <input type="text" id="busca" name="q" class="form-control shadow-sm" placeholder="Digite o que procura..." value="{{ consulta | escape }}" autofocus>
                 </div>
-                <div class="col-md-2 d-grid">
-                    <button class="btn btn-outline-primary shadow-sm" type="submit" aria-label="Buscar negócios">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">
-                            <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/>
-                        </svg>
-                        Buscar
-                    </button>
+                <div class="col-md-4">
+                    <div class="d-flex gap-2">
+                        <button class="btn btn-outline-primary shadow-sm flex-fill" type="submit" aria-label="Buscar negócios">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">
+                                <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/>
+                            </svg>
+                            Buscar
+                        </button>
+                        <a href="{{ url_for('index') }}" class="btn btn-outline-secondary shadow-sm flex-fill" aria-label="Limpar filtros">Limpar</a>
+                    </div>
                 </div>
             </div>
         </form>
@@ -110,7 +130,9 @@
         <!-- Resultados -->
         {% if tabela %}
             <h5 class="mb-3">Exibindo resultados para "<strong>{{ consulta | escape }}</strong>" {% if categoria_selecionada %} na categoria "<strong>{{ categoria_selecionada | escape }}</strong>"{% endif %}</h5>
-            <div class="table-responsive">
+
+            <!-- Tabela para desktops -->
+            <div class="table-responsive d-none d-md-block">
                 <table class="table table-bordered table-hover align-middle text-center">
                     <thead class="table-light">
                         <tr>
@@ -129,6 +151,30 @@
                         {% endfor %}
                     </tbody>
                 </table>
+            </div>
+
+            <!-- Cartões para dispositivos móveis -->
+            <div class="d-md-none">
+                {% for linha in tabela %}
+                    <div class="card mb-3 shadow-sm">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ linha['Nome da Empresa'] | escape }}</h5>
+                            <p class="card-text">{{ linha['Categoria do Negócio'] | escape }}</p>
+                            <button class="btn btn-outline-primary btn-sm" type="button" data-bs-toggle="collapse" data-bs-target="#details-{{ loop.index }}" aria-expanded="false" aria-controls="details-{{ loop.index }}">
+                                Ver mais
+                            </button>
+                            <div class="collapse mt-3" id="details-{{ loop.index }}">
+                                <ul class="list-group list-group-flush">
+                                    {% for chave, valor in linha.items() %}
+                                        {% if chave not in ['Nome da Empresa', 'Categoria do Negócio'] %}
+                                            <li class="list-group-item"><strong>{{ chave | escape }}:</strong> {{ valor | escape }}</li>
+                                        {% endif %}
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
             </div>
         {% elif consulta or categoria_selecionada %}
             <div class="alert alert-warning text-center mt-4">
@@ -149,5 +195,9 @@
 
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-</html>
+    <!-- JavaScript para o spinner -->
+    <script>
+        document.getElementById('search-form').addEventListener('submit', () => {
+            document.getElementById('loading').classList.remove('d-none');
+        });
+    </script>
