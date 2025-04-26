@@ -44,20 +44,19 @@ def index():
 
     df = carregar_dados()
 
-    # Remover espaços em branco das colunas, se houver
+    # Corrige possíveis espaços nos nomes das colunas
     df.columns = df.columns.str.strip()
 
-    # Verifica se a coluna existe antes de continuar
-    if 'Categoria do Negócio' in df.columns:
-        categorias = sorted(df['Categoria do Negócio'].dropna().unique()) if not df.empty else []
-    else:
-        categorias = []
+    tem_categoria = 'Categoria do Negócio' in df.columns
 
-    # Filtragem pelo texto digitado e pela categoria
+    # Define as categorias apenas se a coluna existir
+    categorias = sorted(df['Categoria do Negócio'].dropna().unique()) if tem_categoria and not df.empty else []
+
+    # Filtragem
     if not df.empty:
         if query:
             df = df[df.apply(lambda row: query in str(row).lower(), axis=1)]
-        if filtro_categoria and 'Categoria do Negócio' in df.columns:
+        if filtro_categoria and tem_categoria:
             df = df[df['Categoria do Negócio'] == filtro_categoria]
 
     return render_template(
@@ -67,7 +66,6 @@ def index():
         categorias=categorias,
         categoria_selecionada=filtro_categoria
     )
-
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
