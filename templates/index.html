@@ -59,12 +59,6 @@
         .business-card .btn-sm {
             margin-top: 0.5rem;
         }
-        .debug-info {
-            background-color: #f8d7da;
-            padding: 1rem;
-            border-radius: 0.5rem;
-            margin-bottom: 1rem;
-        }
         .loading-spinner {
             position: fixed;
             top: 50%;
@@ -144,18 +138,6 @@
             </div>
         </form>
 
-        <!-- Depuração: Exibir chaves disponíveis -->
-        {% if tabela %}
-            <div class="debug-info">
-                <p><strong>Chaves disponíveis no primeiro registro:</strong></p>
-                <ul>
-                    {% for chave in tabela[0].keys() %}
-                        <li>{{ chave | escape }}</li>
-                    {% endfor %}
-                </ul>
-            </div>
-        {% endif %}
-
         <!-- Resultados -->
         {% if tabela %}
             <h5 class="mb-3">Exibindo resultados para "<strong>{{ consulta | escape }}</strong>" {% if categoria_selecionada %} na categoria "<strong>{{ categoria_selecionada | escape }}</strong>"{% endif %}</h5>
@@ -167,12 +149,10 @@
                 <h6 class="category-header">{{ categoria | escape }}</h6>
                 <!-- Lista de negócios -->
                 <div class="mb-4">
-                    {% for linha in tabela | selectattr('Categoria do Negócio', 'equalto', categoria) | sort(attribute='Nome da Empresa') %}
+                    {% for linha in tabela | selectattr('Categoria do Negócio', 'equalto', categoria) | sort(attribute='Nome do Negócio') %}
                         <div class="business-card card mb-2 shadow-sm">
                             <div class="card-body">
-                                {% if linha['Nome da Empresa'] %}
-                                    <h5 class="card-title">{{ linha['Nome da Empresa'] | escape }}</h5>
-                                {% elif linha['Nome do Negócio'] %}
+                                {% if linha['Nome do Negócio'] %}
                                     <h5 class="card-title">{{ linha['Nome do Negócio'] | escape }}</h5>
                                 {% else %}
                                     <h5 class="card-title text-muted">Negócio sem nome</h5>
@@ -183,7 +163,7 @@
                                 <div class="collapse mt-3" id="details-{{ categoria | replace(' ', '-') }}-{{ loop.index }}">
                                     <ul class="list-group list-group-flush">
                                         {% for chave, valor in linha.items() %}
-                                            {% if chave not in ['Nome da Empresa', 'Categoria do Negócio', 'Nome do Negócio'] %}
+                                            {% if chave not in ['Nome do Negócio', 'Categoria do Negócio'] %}
                                                 <li class="list-group-item"><strong>{{ chave | escape }}:</strong> {{ valor | escape }}</li>
                                             {% endif %}
                                         {% endfor %}
