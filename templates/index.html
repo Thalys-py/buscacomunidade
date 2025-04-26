@@ -143,34 +143,43 @@
             <h5 class="mb-3">Exibindo resultados para "<strong>{{ consulta | escape }}</strong>" {% if categoria_selecionada %} na categoria "<strong>{{ categoria_selecionada | escape }}</strong>"{% endif %}</h5>
 
             <!-- Agrupamento por categoria -->
-            {% set categorias_unicas = tabela | map(attribute='Categoria do Negócio') | unique | sort %}
-            {% for categoria in categorias_unicas %}
+            {% set categorias_unicas = [] %}
+            {% for linha in tabela %}
+                {% if linha['Categoria do Negócio'] is defined and linha['Categoria do Negócio'] %}
+                    {% if linha['Categoria do Negócio'] not in categorias_unicas %}
+                        {% set _ = categorias_unicas.append(linha['Categoria do Negócio']) %}
+                    {% endif %}
+                {% endif %}
+            {% endfor %}
+            {% for categoria in categorias_unicas | sort %}
                 <!-- Cabeçalho da categoria -->
                 <h6 class="category-header">{{ categoria | escape }}</h6>
                 <!-- Lista de negócios -->
                 <div class="mb-4">
-                    {% for linha in tabela | selectattr('Categoria do Negócio', 'equalto', categoria) | sort(attribute='Nome do Negócio') %}
-                        <div class="business-card card mb-2 shadow-sm">
-                            <div class="card-body">
-                                {% if linha['Nome do Negócio'] %}
-                                    <h5 class="card-title">{{ linha['Nome do Negócio'] | escape }}</h5>
-                                {% else %}
-                                    <h5 class="card-title text-muted">Negócio sem nome</h5>
-                                {% endif %}
-                                <button class="btn btn-outline-primary btn-sm" type="button" data-bs-toggle="collapse" data-bs-target="#details-{{ categoria | replace(' ', '-') }}-{{ loop.index }}" aria-expanded="false" aria-controls="details-{{ categoria | replace(' ', '-') }}-{{ loop.index }}">
-                                    Ver mais
-                                </button>
-                                <div class="collapse mt-3" id="details-{{ categoria | replace(' ', '-') }}-{{ loop.index }}">
-                                    <ul class="list-group list-group-flush">
-                                        {% for chave, valor in linha.items() %}
-                                            {% if chave not in ['Nome do Negócio', 'Categoria do Negócio'] %}
-                                                <li class="list-group-item"><strong>{{ chave | escape }}:</strong> {{ valor | escape }}</li>
-                                            {% endif %}
-                                        {% endfor %}
-                                    </ul>
+                    {% for linha in tabela %}
+                        {% if linha['Categoria do Negócio'] is defined and linha['Categoria do Negócio'] == categoria %}
+                            <div class="business-card card mb-2 shadow-sm">
+                                <div class="card-body">
+                                    {% if linha['Nome do Negócio'] is defined and linha['Nome do Negócio'] %}
+                                        <h5 class="card-title">{{ linha['Nome do Negócio'] | escape }}</h5>
+                                    {% else %}
+                                        <h5 class="card-title text-muted">Negócio sem nome</h5>
+                                    {% endif %}
+                                    <button class="btn btn-outline-primary btn-sm" type="button" data-bs-toggle="collapse" data-bs-target="#details-{{ categoria | replace(' ', '-') }}-{{ loop.index }}" aria-expanded="false" aria-controls="details-{{ categoria | replace(' ', '-') }}-{{ loop.index }}">
+                                        Ver mais
+                                    </button>
+                                    <div class="collapse mt-3" id="details-{{ categoria | replace(' ', '-') }}-{{ loop.index }}">
+                                        <ul class="list-group list-group-flush">
+                                            {% for chave, valor in linha.items() %}
+                                                {% if chave not in ['Nome do Negócio', 'Categoria do Negócio'] %}
+                                                    <li class="list-group-item"><strong>{{ chave | escape }}:</strong> {{ valor | escape }}</li>
+                                                {% endif %}
+                                            {% endfor %}
+                                        </ul>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
+                        {% endif %}
                     {% endfor %}
                 </div>
             {% endfor %}
