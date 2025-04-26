@@ -53,9 +53,17 @@
         }
         .business-card .card-title {
             margin-bottom: 0.5rem;
+            font-size: 1.25rem;
+            color: #333;
         }
         .business-card .btn-sm {
             margin-top: 0.5rem;
+        }
+        .debug-info {
+            background-color: #f8d7da;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin-bottom: 1rem;
         }
         .loading-spinner {
             position: fixed;
@@ -136,6 +144,18 @@
             </div>
         </form>
 
+        <!-- Depuração: Exibir chaves disponíveis -->
+        {% if tabela %}
+            <div class="debug-info">
+                <p><strong>Chaves disponíveis no primeiro registro:</strong></p>
+                <ul>
+                    {% for chave in tabela[0].keys() %}
+                        <li>{{ chave | escape }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endif %}
+
         <!-- Resultados -->
         {% if tabela %}
             <h5 class="mb-3">Exibindo resultados para "<strong>{{ consulta | escape }}</strong>" {% if categoria_selecionada %} na categoria "<strong>{{ categoria_selecionada | escape }}</strong>"{% endif %}</h5>
@@ -150,14 +170,20 @@
                     {% for linha in tabela | selectattr('Categoria do Negócio', 'equalto', categoria) | sort(attribute='Nome da Empresa') %}
                         <div class="business-card card mb-2 shadow-sm">
                             <div class="card-body">
-                                <h5 class="card-title">{{ linha['Nome da Empresa'] | escape }}</h5>
+                                {% if linha['Nome da Empresa'] %}
+                                    <h5 class="card-title">{{ linha['Nome da Empresa'] | escape }}</h5>
+                                {% elif linha['Nome do Negócio'] %}
+                                    <h5 class="card-title">{{ linha['Nome do Negócio'] | escape }}</h5>
+                                {% else %}
+                                    <h5 class="card-title text-muted">Negócio sem nome</h5>
+                                {% endif %}
                                 <button class="btn btn-outline-primary btn-sm" type="button" data-bs-toggle="collapse" data-bs-target="#details-{{ categoria | replace(' ', '-') }}-{{ loop.index }}" aria-expanded="false" aria-controls="details-{{ categoria | replace(' ', '-') }}-{{ loop.index }}">
                                     Ver mais
                                 </button>
                                 <div class="collapse mt-3" id="details-{{ categoria | replace(' ', '-') }}-{{ loop.index }}">
                                     <ul class="list-group list-group-flush">
                                         {% for chave, valor in linha.items() %}
-                                            {% if chave not in ['Nome da Empresa', 'Categoria do Negócio'] %}
+                                            {% if chave not in ['Nome da Empresa', 'Categoria do Negócio', 'Nome do Negócio'] %}
                                                 <li class="list-group-item"><strong>{{ chave | escape }}:</strong> {{ valor | escape }}</li>
                                             {% endif %}
                                         {% endfor %}
