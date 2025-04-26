@@ -140,7 +140,13 @@
 
         <!-- Resultados -->
         {% if tabela %}
-            <h5 class="mb-3">Exibindo resultados para "<strong>{{ consulta | escape }}</strong>" {% if categoria_selecionada %} na categoria "<strong>{{ categoria_selecionada | escape }}</strong>"{% endif %}</h5>
+            <h5 class="mb-3">
+    Foram encontrados <strong>{{ quantidade_resultados }}</strong> resultado{{ '' if quantidade_resultados == 1 else 's' }} para 
+    "{% if consulta %}<strong>{{ consulta | escape }}</strong>{% else %}todos{% endif %}" 
+    {% if categoria_selecionada %}
+        na categoria "<strong>{{ categoria_selecionada | escape }}</strong>"
+    {% endif %}
+</h5>
 
             <!-- Agrupamento por categoria -->
             {% set categorias_unicas = [] %}
