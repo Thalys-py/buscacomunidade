@@ -4,10 +4,14 @@
     <meta charset="UTF-8">
     <title>Buscador de Negócios</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    
+    <meta name="description" content="Encontre negócios locais da comunidade com nosso buscador fácil e rápido.">
+    <meta name="keywords" content="negócios, comunidade, busca, local">
+    <meta property="og:title" content="Buscador de Negócios da Comunidade">
+    <meta property="og:description" content="Encontre negócios locais da comunidade com nosso buscador fácil e rápido.">
+    <meta property="og:type" content="website">
+
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
 
@@ -16,68 +20,54 @@
             font-family: 'Inter', sans-serif;
             background-color: #f8f9fa;
         }
-
         .buscador-container {
             background: white;
             padding: 2rem;
             border-radius: 1rem;
             box-shadow: 0 4px 20px rgba(0,0,0,0.05);
         }
-
         .form-control, .form-select {
             border-radius: 0.5rem;
         }
-
         .table thead {
             background-color: #f1f3f5;
         }
-
+        .table tbody tr:hover {
+            background-color: #f1f3f5;
+            transition: background-color 0.2s;
+        }
         footer {
             margin-top: 4rem;
         }
-
         .btn-outline-primary {
             border-radius: 0.5rem;
             font-weight: 600;
         }
-
         .titulo-site {
             font-size: 2.5rem;
             font-weight: 600;
             color: #0d6efd;
         }
-
-        /* Ajustes de responsividade */
         @media (max-width: 768px) {
             .buscador-container {
                 padding: 1.5rem;
             }
-
             .titulo-site {
                 font-size: 2rem;
             }
-
             .form-control, .form-select, .btn-outline-primary {
                 font-size: 1rem;
             }
-
-            .table thead th {
+            .table thead th, .table tbody td {
                 font-size: 0.875rem;
             }
-
-            .table tbody td {
-                font-size: 0.875rem;
-            }
-
             .form-control, .form-select {
                 width: 100%;
             }
-
             .col-md-6, .col-md-4, .col-md-2 {
                 width: 100%;
                 margin-bottom: 1rem;
             }
-
             .d-grid {
                 width: 100%;
             }
@@ -85,42 +75,47 @@
     </style>
 </head>
 <body class="container py-5">
-
     <div class="buscador-container">
         <h1 class="text-center titulo-site mb-4">🔍 Buscador de Negócios da Comunidade</h1>
 
         <!-- Formulário de busca e filtro -->
         <form method="get" class="mb-4">
             <div class="row g-3">
-                <!-- Dropdown de categoria antes da caixa de busca -->
                 <div class="col-md-4">
-                    <select name="categoria" class="form-select shadow-sm">
+                    <label for="categoria" class="form-label visually-hidden">Categoria</label>
+                    <select id="categoria" name="categoria" class="form-select shadow-sm">
                         <option value="">Todas as categorias</option>
                         {% for categoria in categorias %}
-                            <option value="{{ categoria }}" {% if categoria == categoria_selecionada %}selected{% endif %}>
-                                {{ categoria }}
+                            <option value="{{ categoria | escape }}" {% if categoria == categoria_selecionada %}selected{% endif %}>
+                                {{ categoria | escape }}
                             </option>
                         {% endfor %}
                     </select>
                 </div>
                 <div class="col-md-6">
-                    <input type="text" name="q" class="form-control shadow-sm" placeholder="Digite o que procura..." value="{{ consulta }}" autofocus>
+                    <label for="busca" class="form-label visually-hidden">Pesquisar negócios</label>
+                    <input type="text" id="busca" name="q" class="form-control shadow-sm" placeholder="Digite o que procura..." value="{{ consulta | escape }}" autofocus>
                 </div>
                 <div class="col-md-2 d-grid">
-                    <button class="btn btn-outline-primary shadow-sm" type="submit">Buscar</button>
+                    <button class="btn btn-outline-primary shadow-sm" type="submit" aria-label="Buscar negócios">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">
+                            <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/>
+                        </svg>
+                        Buscar
+                    </button>
                 </div>
             </div>
         </form>
 
         <!-- Resultados -->
         {% if tabela %}
-            <h5 class="mb-3">Exibindo resultados para "<strong>{{ consulta }}</strong>" {% if categoria_selecionada %} na categoria "<strong>{{ categoria_selecionada }}</strong>"{% endif %}</h5>
+            <h5 class="mb-3">Exibindo resultados para "<strong>{{ consulta | escape }}</strong>" {% if categoria_selecionada %} na categoria "<strong>{{ categoria_selecionada | escape }}</strong>"{% endif %}</h5>
             <div class="table-responsive">
                 <table class="table table-bordered table-hover align-middle text-center">
                     <thead class="table-light">
                         <tr>
                             {% for chave in tabela[0].keys() %}
-                                <th class="text-nowrap">{{ chave }}</th>
+                                <th class="text-nowrap">{{ chave | escape }}</th>
                             {% endfor %}
                         </tr>
                     </thead>
@@ -128,7 +123,7 @@
                         {% for linha in tabela %}
                             <tr>
                                 {% for valor in linha.values() %}
-                                    <td>{{ valor }}</td>
+                                    <td>{{ valor | escape }}</td>
                                 {% endfor %}
                             </tr>
                         {% endfor %}
@@ -137,7 +132,11 @@
             </div>
         {% elif consulta or categoria_selecionada %}
             <div class="alert alert-warning text-center mt-4">
-                Nenhum resultado encontrado para "<strong>{{ consulta }}</strong>"{% if categoria_selecionada %} na categoria "<strong>{{ categoria_selecionada }}</strong>"{% endif %}.
+                Nenhum resultado encontrado para "<strong>{{ consulta | escape }}</strong>"{% if categoria_selecionada %} na categoria "<strong>{{ categoria_selecionada | escape }}</strong>"{% endif %}. Tente outro termo ou categoria.
+            </div>
+        {% else %}
+            <div class="alert alert-info text-center mt-4">
+                Digite um termo ou selecione uma categoria para começar a busca.
             </div>
         {% endif %}
     </div>
