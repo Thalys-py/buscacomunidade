@@ -106,23 +106,6 @@
     <div class="buscador-container">
         <h1 class="text-center titulo-site mb-4">🔍 Buscador de Negócios da Comunidade</h1>
 
-  <!-- Botão de Cadastro de Negócios -->
-   <!-- Botão discreto de Cadastro de Negócios com opções de Compartilhamento -->
-<div class="text-center mb-4">
-    <button class="btn btn-outline-secondary btn-lg" id="share-button" role="button">
-        Cadastre o seu negócio ou compartilhe com alguém que possa aderir ao cadastro
-    </button>
-    <!-- Dropdown com opções de compartilhamento -->
-    <div id="share-options" class="mt-3 d-none">
-        <a href="https://tinyurl.com/buscacomunidade" class="btn btn-outline-success btn-sm mb-2" target="_blank" role="button">
-            Ir para o Formulário
-        </a>
-        <a href="https://wa.me/?text=Cadastre seu negócio ou compartilhe com alguém que possa aderir ao cadastro: https://tinyurl.com/buscacomunidade" class="btn btn-outline-success btn-sm mb-2" target="_blank" role="button">
-            Compartilhar no WhatsApp
-        </a>
-    </div>
-</div>
-        
         <!-- Formulário de busca e filtro -->
         <form method="get" class="mb-4" id="search-form">
             <div class="row g-3">
@@ -155,18 +138,18 @@
             </div>
         </form>
 
-<!-- Resultados -->
-{% if consulta or categoria_selecionada %}
-    <h5 class="mb-3">
-        Foram encontrados <strong>{{ quantidade_resultados }}</strong> resultado{{ '' if quantidade_resultados == 1 else 's' }} para 
-        "{% if consulta %}<strong>{{ consulta | escape }}</strong>{% else %}todos{% endif %}" 
-        {% if categoria_selecionada %}na categoria "<strong>{{ categoria_selecionada | escape }}</strong>"{% endif %}
-    </h5>
-{% else %}
-    <div class="alert alert-info text-center mt-4">
-        <strong>{{ total_registros }}</strong> negócios cadastrados
-    </div>
-{% endif %}
+        <!-- Resultados -->
+        {% if consulta or categoria_selecionada %}
+            <h5 class="mb-3">
+                Foram encontrados <strong>{{ quantidade_resultados }}</strong> resultado{{ '' if quantidade_resultados == 1 else 's' }} para 
+                "{% if consulta %}<strong>{{ consulta | escape }}</strong>{% else %}todos{% endif %}" 
+                {% if categoria_selecionada %}na categoria "<strong>{{ categoria_selecionada | escape }}</strong>"{% endif %}
+            </h5>
+        {% else %}
+            <div class="alert alert-info text-center mt-4">
+                <strong>{{ total_registros }}</strong> negócios cadastrados
+            </div>
+        {% endif %}
 
         <!-- Agrupamento por categoria -->
         {% set categorias_unicas = [] %}
@@ -211,8 +194,20 @@
         {% endfor %}
     </div>
 
-    <!-- Rodapé -->
-    <footer class="text-center text-secondary small">
+    <!-- Botão no rodapé -->
+    <footer class="text-center mt-4">
+        <button class="btn btn-outline-secondary btn-lg" id="share-button" role="button">
+            Cadastre o seu negócio ou compartilhe com alguém que possa aderir ao cadastro
+        </button>
+        <!-- Dropdown com opções de compartilhamento -->
+        <div id="share-options" class="mt-3 d-none">
+            <a href="https://tinyurl.com/buscacomunidade" class="btn btn-outline-success btn-sm mb-2" target="_blank" role="button">
+                Ir para o Formulário
+            </a>
+            <a href="https://wa.me/?text=Cadastre seu negócio ou compartilhe com alguém que possa aderir ao cadastro: https://tinyurl.com/buscacomunidade" class="btn btn-outline-success btn-sm mb-2" target="_blank" role="button">
+                Compartilhar no WhatsApp
+            </a>
+        </div>
         <hr>
         <p>Feito por Thalys • (54) 99616-1606</p>
     </footer>
@@ -229,12 +224,16 @@
             document.getElementById('loading').classList.remove('d-none');
         });
 
-<script>
-    document.getElementById('share-button').addEventListener('click', function() {
-        var shareOptions = document.getElementById('share-options');
-        shareOptions.classList.toggle('d-none'); // Alterna a visibilidade das opções
-    });
-</script>
-    
+        // Garantir que o script seja executado após o carregamento do DOM
+        document.addEventListener('DOMContentLoaded', function() {
+            var shareButton = document.getElementById('share-button');
+            var shareOptions = document.getElementById('share-options');
+            
+            // Quando o botão for clicado, alterna a visibilidade das opções
+            shareButton.addEventListener('click', function() {
+                shareOptions.classList.toggle('d-none');
+            });
+        });
+    </script>
 </body>
 </html>
