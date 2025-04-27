@@ -132,72 +132,66 @@
                             </svg>
                             Buscar
                         </button>
-                        <a href="{{ url_for('index') }}" class="btn btn-outline-secondary shadow-sm flex-fill" aria-label="Limpar filtros">Limpar</a>
+                        <a href="{{ url_for('index') }}" class="btn btn-outline-secondary shadow-sm flex-fill" aria-label="Limpar filtros" id="clear-button">Limpar</a>
                     </div>
                 </div>
             </div>
         </form>
 
         <!-- Resultados -->
-        {% if tabela %}
+        {% if consulta or categoria_selecionada %}
             <h5 class="mb-3">
-    Foram encontrados <strong>{{ quantidade_resultados }}</strong> resultado{{ '' if quantidade_resultados == 1 else 's' }} para 
-    "{% if consulta %}<strong>{{ consulta | escape }}</strong>{% else %}todos{% endif %}" 
-    {% if categoria_selecionada %}
-        na categoria "<strong>{{ categoria_selecionada | escape }}</strong>"
-    {% endif %}
-</h5>
-
-            <!-- Agrupamento por categoria -->
-            {% set categorias_unicas = [] %}
-            {% for linha in tabela %}
-                {% if linha['Categoria do Negócio'] is defined and linha['Categoria do Negócio'] %}
-                    {% if linha['Categoria do Negócio'] not in categorias_unicas %}
-                        {% set _ = categorias_unicas.append(linha['Categoria do Negócio']) %}
-                    {% endif %}
-                {% endif %}
-            {% endfor %}
-            {% for categoria in categorias_unicas | sort %}
-                <!-- Cabeçalho da categoria -->
-                <h6 class="category-header">{{ categoria | escape }}</h6>
-                <!-- Lista de negócios -->
-                <div class="mb-4">
-                    {% for linha in tabela %}
-                        {% if linha['Categoria do Negócio'] is defined and linha['Categoria do Negócio'] == categoria %}
-                            <div class="business-card card mb-2 shadow-sm">
-                                <div class="card-body">
-                                    {% if linha['Nome do Negócio'] is defined and linha['Nome do Negócio'] %}
-                                        <h5 class="card-title">{{ linha['Nome do Negócio'] | escape }}</h5>
-                                    {% else %}
-                                        <h5 class="card-title text-muted">Negócio sem nome</h5>
-                                    {% endif %}
-                                    <button class="btn btn-outline-primary btn-sm" type="button" data-bs-toggle="collapse" data-bs-target="#details-{{ categoria | replace(' ', '-') }}-{{ loop.index }}" aria-expanded="false" aria-controls="details-{{ categoria | replace(' ', '-') }}-{{ loop.index }}">
-                                        Ver mais
-                                    </button>
-                                    <div class="collapse mt-3" id="details-{{ categoria | replace(' ', '-') }}-{{ loop.index }}">
-                                        <ul class="list-group list-group-flush">
-                                            {% for chave, valor in linha.items() %}
-                                                {% if chave not in ['Nome do Negócio', 'Categoria do Negócio'] %}
-                                                    <li class="list-group-item"><strong>{{ chave | escape }}:</strong> {{ valor | escape }}</li>
-                                                {% endif %}
-                                            {% endfor %}
-                                        </ul>
-                                    </div>
-                                </div>
-                            </div>
-                        {% endif %}
-                    {% endfor %}
-                </div>
-            {% endfor %}
-        {% elif consulta or categoria_selecionada %}
-            <div class="alert alert-warning text-center mt-4">
-                Nenhum resultado encontrado para "<strong>{{ consulta | escape }}</strong>"{% if categoria_selecionada %} na categoria "<strong>{{ categoria_selecionada | escape }}</strong>"{% endif %}. Tente outro termo ou categoria.
-            </div>
+                Foram encontrados <strong>{{ quantidade_resultados }}</strong> resultado{{ '' if quantidade_resultados == 1 else 's' }} para 
+                "{% if consulta %}<strong>{{ consulta | escape }}</strong>{% else %}todos{% endif %}" 
+                {% if categoria_selecionada %}na categoria "<strong>{{ categoria_selecionada | escape }}</strong>"{% endif %}
+            </h5>
         {% else %}
             <div class="alert alert-info text-center mt-4">
-                Digite um termo ou selecione uma categoria para começar a busca.
+                <strong>{{ total_registros }}</strong> negócios cadastrados
             </div>
         {% endif %}
+
+        <!-- Agrupamento por categoria -->
+        {% set categorias_unicas = [] %}
+        {% for linha in tabela %}
+            {% if linha['Categoria do Negócio'] is defined and linha['Categoria do Negócio'] %}
+                {% if linha['Categoria do Negócio'] not in categorias_unicas %}
+                    {% set _ = categorias_unicas.append(linha['Categoria do Negócio']) %}
+                {% endif %}
+            {% endif %}
+        {% endfor %}
+        {% for categoria in categorias_unicas | sort %}
+            <!-- Cabeçalho da categoria -->
+            <h6 class="category-header">{{ categoria | escape }}</h6>
+            <!-- Lista de negócios -->
+            <div class="mb-4">
+                {% for linha in tabela %}
+                    {% if linha['Categoria do Negócio'] is defined and linha['Categoria do Negócio'] == categoria %}
+                        <div class="business-card card mb-2 shadow-sm">
+                            <div class="card-body">
+                                {% if linha['Nome do Negócio'] is defined and linha['Nome do Negócio'] %}
+                                    <h5 class="card-title">{{ linha['Nome do Negócio'] | escape }}</h5>
+                                {% else %}
+                                    <h5 class="card-title text-muted">Negócio sem nome</h5>
+                                {% endif %}
+                                <button class="btn btn-outline-primary btn-sm" type="button" data-bs-toggle="collapse" data-bs-target="#details-{{ categoria | replace(' ', '-') }}-{{ loop.index }}" aria-expanded="false" aria-controls="details-{{ categoria | replace(' ', '-') }}-{{ loop.index }}">
+                                    Ver mais
+                                </button>
+                                <div class="collapse mt-3" id="details-{{ categoria | replace(' ', '-') }}-{{ loop.index }}">
+                                    <ul class="list-group list-group-flush">
+                                        {% for chave, valor in linha.items() %}
+                                            {% if chave not in ['Nome do Negócio', 'Categoria do Negócio'] %}
+                                                <li class="list-group-item"><strong>{{ chave | escape }}:</strong> {{ valor | escape }}</li>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    {% endif %}
+                {% endfor %}
+            </div>
+        {% endfor %}
     </div>
 
     <!-- Rodapé -->
@@ -213,4 +207,10 @@
         document.getElementById('search-form').addEventListener('submit', () => {
             document.getElementById('loading').classList.remove('d-none');
         });
+
+        document.getElementById('clear-button').addEventListener('click', () => {
+            document.getElementById('loading').classList.remove('d-none');
+        });
     </script>
+</body>
+</html>
