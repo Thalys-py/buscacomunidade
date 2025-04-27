@@ -138,18 +138,18 @@
             </div>
         </form>
 
-        <!-- Resultados -->
-        {% if consulta or categoria_selecionada %}
-            <h5 class="mb-3">
-                Foram encontrados <strong>{{ quantidade_resultados }}</strong> resultado{{ '' if quantidade_resultados == 1 else 's' }} para 
-                "{% if consulta %}<strong>{{ consulta | escape }}</strong>{% else %}todos{% endif %}" 
-                {% if categoria_selecionada %}na categoria "<strong>{{ categoria_selecionada | escape }}</strong>"{% endif %}
-            </h5>
-        {% else %}
-            <div class="alert alert-info text-center mt-4">
-                <strong>{{ total_registros }}</strong> negócios cadastrados
-            </div>
-        {% endif %}
+<!-- Resultados -->
+{% if consulta or categoria_selecionada %}
+    <h5 class="mb-3">
+        Foram encontrados <strong>{{ quantidade_resultados }}</strong> resultado{{ '' if quantidade_resultados == 1 else 's' }} para 
+        "{% if consulta %}<strong>{{ consulta | escape }}</strong>{% else %}todos{% endif %}" 
+        {% if categoria_selecionada %}na categoria "<strong>{{ categoria_selecionada | escape }}</strong>"{% endif %}
+    </h5>
+{% else %}
+    <div class="alert alert-info text-center mt-4">
+        <strong>{{ total_registros }}</strong> negócios cadastrados
+    </div>
+{% endif %}
 
         <!-- Agrupamento por categoria -->
         {% set categorias_unicas = [] %}
