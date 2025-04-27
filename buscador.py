@@ -69,11 +69,11 @@ def index():
 
     df = carregar_dados()
 
+    # Calcular o número total de negócios cadastrados antes dos filtros
+    total_registros = len(df)
+
     # Obter categorias únicas para o dropdown
     categorias = sorted(df['Categoria do Negócio'].dropna().unique()) if not df.empty else []
-
-    # Exibir categorias para depuração
-    print("Categorias disponíveis:", categorias)
 
     # Filtragem
     if not df.empty:
@@ -82,7 +82,7 @@ def index():
         if filtro_categoria:
             df = df[df['Categoria do Negócio'] == filtro_categoria]
 
-    # Exibir número de registros para depuração
+    # Exibir número de resultados filtrados
     quantidade_resultados = len(df)
     print(f"Registros enviados ao template: {quantidade_resultados}")
 
@@ -92,7 +92,8 @@ def index():
         consulta=query,
         categorias=categorias,
         categoria_selecionada=filtro_categoria,
-        quantidade_resultados=quantidade_resultados
+        quantidade_resultados=quantidade_resultados,
+        total_registros=total_registros  # Passando o total de registros para o template
     )
 
 if __name__ == '__main__':
